@@ -7,7 +7,7 @@ where
 
 import Control.Monad
 import Data.Maybe
-import Network.HTTP
+import qualified Network.HTTP as HTTP
 import Text.XML.Light
 
 import Database.HSparql.QueryGenerator
@@ -63,7 +63,7 @@ structureContent s =
 --  'Variable's in the 'Query' action.
 query :: EndPoint -> Query [Variable] -> IO (Maybe [[BindingValue]])
 query ep q = do
-    let uri      = ep ++ "?" ++ urlEncodeVars [("query", createQuery q)]
-        request  = replaceHeader HdrUserAgent "hsparql-client" (getRequest uri)
-    response <- simpleHTTP request >>= getResponseBody
+    let uri      = ep ++ "?" ++ HTTP.urlEncodeVars [("query", createQuery q)]
+        request  = HTTP.replaceHeader HTTP.HdrUserAgent "hsparql-client" (HTTP.getRequest uri)
+    response <- HTTP.simpleHTTP request >>= HTTP.getResponseBody
     return $ structureContent response
